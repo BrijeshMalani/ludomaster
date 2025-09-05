@@ -3,12 +3,12 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../Utils/common.dart';
 
-class NativeAdBannerWidget extends StatefulWidget {
+class NativeBannerAdWidget extends StatefulWidget {
   @override
-  _NativeAdBannerWidgetState createState() => _NativeAdBannerWidgetState();
+  _NativeBannerAdWidgetState createState() => _NativeBannerAdWidgetState();
 }
 
-class _NativeAdBannerWidgetState extends State<NativeAdBannerWidget> {
+class _NativeBannerAdWidgetState extends State<NativeBannerAdWidget> {
   NativeAd? _nativeAd;
   bool _isAdLoaded = false;
 
@@ -18,7 +18,7 @@ class _NativeAdBannerWidgetState extends State<NativeAdBannerWidget> {
 
     _nativeAd = NativeAd(
       adUnitId: Common.native_ad_id, // Test Native Ad Unit ID
-      factoryId: 'listTile', // Same as registered in Android (see step 5)
+      factoryId: 'banner', // Different factory ID for banner-style native ads
       listener: NativeAdListener(
         onAdLoaded: (ad) {
           setState(() {
@@ -26,7 +26,7 @@ class _NativeAdBannerWidgetState extends State<NativeAdBannerWidget> {
           });
         },
         onAdFailedToLoad: (ad, error) {
-          print('Ad failed to load: $error');
+          print('Banner Native Ad failed to load: $error');
           ad.dispose();
         },
       ),
@@ -44,7 +44,7 @@ class _NativeAdBannerWidgetState extends State<NativeAdBannerWidget> {
   Widget build(BuildContext context) {
     return _isAdLoaded
         ? Container(
-            height: 265,
+            height: 160, // Smaller height for banner-style native ad
             child: AdWidget(ad: _nativeAd!),
           )
         : SizedBox(); // Empty space before ad loads

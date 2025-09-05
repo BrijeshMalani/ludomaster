@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ludomaster/widgets/native_ad_widget.dart';
+import 'package:ludomaster/widgets/native_banner_ad_widget.dart';
 
 import 'Utils/common.dart';
 
@@ -28,17 +30,31 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Common.Qurekaid.isNotEmpty
-                            ? const InkWell(
-                                onTap: Common.openUrl,
-                                child: Image(
-                                  image: AssetImage(
-                                    "assets/images/qurekaads.png",
-                                  ),
-                                  fit: BoxFit.cover,
+                        Stack(
+                          children: [
+                            Common.Qurekaid.isNotEmpty
+                                ? InkWell(
+                              onTap: Common.openUrl,
+                              child: Image(
+                                image: AssetImage(
+                                  "assets/images/qurekaads.png",
                                 ),
-                              )
-                            : SizedBox(),
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                                : Image(
+                              image: AssetImage("assets/images/j1.png"),
+                              fit: BoxFit.cover,
+                            ),
+
+                            Common.native_ad_id.isNotEmpty
+                                ? NativeAdWidget()
+                                : Image(
+                              image: AssetImage("assets/images/j1.png"),
+                              fit: BoxFit.cover,
+                            ),
+                          ],
+                        ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
@@ -253,18 +269,25 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                Common.Qurekaid.isNotEmpty
-                    ? InkWell(
-                        onTap: Common.openUrl,
-                        child: Image(
-                          width: MediaQuery.of(context).size.width,
-                          image: const AssetImage(
-                            "assets/images/bannerads.png",
-                          ),
-                          fit: BoxFit.fill,
+                Stack(
+                  children: [
+                    Common.Qurekaid.isNotEmpty
+                        ? InkWell(
+                      onTap: Common.openUrl,
+                      child: Image(
+                        width: MediaQuery.of(context).size.width,
+                        image: const AssetImage(
+                          "assets/images/bannerads.png",
                         ),
-                      )
-                    : SizedBox(),
+                        fit: BoxFit.fill,
+                      ),
+                    )
+                        : SizedBox(),
+                    Common.native_ad_id.isNotEmpty
+                        ? NativeBannerAdWidget()
+                        : SizedBox(),
+                  ],
+                ),
               ],
             ),
           ),

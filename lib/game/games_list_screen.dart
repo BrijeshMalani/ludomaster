@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../Utils/common.dart';
 import '../models/game_data_model.dart';
+import '../services/app_open_ad_manager.dart';
 import 'game_description_screen.dart';
 
-class GamesListScreen extends StatelessWidget {
+class GamesListScreen extends StatefulWidget {
   final String category;
   final List<Game> games;
 
@@ -14,10 +16,61 @@ class GamesListScreen extends StatelessWidget {
   });
 
   @override
+  State<GamesListScreen> createState() => _GamesListScreenState();
+}
+
+class _GamesListScreenState extends State<GamesListScreen> {
+  BannerAd? _bannerAd;
+  InterstitialAd? _interstitialAd;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInterstitialAd(Common.interstitial_ad_id);
+    _loadInterstitialAd(Common.interstitial_ad_id1);
+    _loadInterstitialAd(Common.interstitial_ad_id2);
+  }
+
+  void _loadInterstitialAd(String ads_id) {
+    InterstitialAd.load(
+      adUnitId: ads_id,
+      // Android test interstitial ad unit ID
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) => _interstitialAd = ad,
+        onAdFailedToLoad: (error) => _interstitialAd = null,
+      ),
+    );
+  }
+
+  void _showInterstitialAd(VoidCallback onAdClosed, String ads_id) {
+    if (_interstitialAd != null) {
+      // Prevent app open ad on the next resume caused by interstitial
+      AppOpenAdManager.suppressNextOnResume();
+      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (ad) {
+          ad.dispose();
+          _loadInterstitialAd(ads_id);
+          onAdClosed();
+        },
+        onAdFailedToShowFullScreenContent: (ad, error) {
+          ad.dispose();
+          _loadInterstitialAd(ads_id);
+          onAdClosed();
+        },
+      );
+      _interstitialAd!.show();
+      _interstitialAd = null;
+    } else {
+      onAdClosed();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('$category Games'),
+        title: Text('${widget.category} Games'),
         backgroundColor: Colors.yellow,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -27,7 +80,7 @@ class GamesListScreen extends StatelessWidget {
           Expanded(
             child: Container(
               color: Color(0xFFF5F5F5),
-              child: games.isEmpty
+              child: widget.games.isEmpty
                   ? const Center(
                       child: Text(
                         'No games found in this category',
@@ -69,12 +122,21 @@ class GamesListScreen extends StatelessWidget {
           if (Common.adsopen == "1") {
             Common.openUrl();
           }
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => GameDescriptionScreen(game: game),
-            ),
-          );
+          Common.interstitial_ad_id.isEmpty
+              ? Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GameDescriptionScreen(game: game),
+                  ),
+                )
+              : _showInterstitialAd(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GameDescriptionScreen(game: game),
+                    ),
+                  );
+                }, Common.interstitial_ad_id);
         },
         borderRadius: BorderRadius.circular(15),
         child: Column(
@@ -209,20 +271,20 @@ class GamesListScreen extends StatelessWidget {
   int _getTotalItemCount() {
     // If no ad ID, just show games
     if (Common.Qurekaid.isEmpty) {
-      return games.length;
+      return widget.games.length;
     }
 
     // Pattern: Ad row (1 item) + 4 games + Ad row (1 item) + 4 games...
     // Every 5 items: 1 ad + 4 games
-    int totalSections = (games.length / 4).ceil();
+    int totalSections = (widget.games.length / 4).ceil();
     return totalSections * 5; // 5 items per section (1 ad + 4 games)
   }
 
   Widget _buildItem(BuildContext context, int index) {
     // If no ad ID, just show games
     if (Common.Qurekaid.isEmpty) {
-      if (index < games.length) {
-        return _buildGameCard(context, games[index]);
+      if (index < widget.games.length) {
+        return _buildGameCard(context, widget.games[index]);
       }
       return Container();
     }
@@ -238,8 +300,8 @@ class GamesListScreen extends StatelessWidget {
 
     // Positions 1, 2, 3, 4 are games
     int gameIndex = sectionIndex * 4 + (positionInSection - 1);
-    if (gameIndex < games.length) {
-      return _buildGameCard(context, games[gameIndex]);
+    if (gameIndex < widget.games.length) {
+      return _buildGameCard(context, widget.games[gameIndex]);
     }
 
     // Fallback empty container

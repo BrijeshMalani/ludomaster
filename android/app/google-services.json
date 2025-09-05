@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "339465441906",
+    "project_id": "ludo-master-d0311",
+    "storage_bucket": "ludo-master-d0311.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:339465441906:android:4c98b8a187f48ad30028eb",
+        "android_client_info": {
+          "package_name": "com.gamewarrier.gamechanger.ludomaster"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2h4dlzzw2LZLvcIaWHOUe0jL-8gqnn0g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

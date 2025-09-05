@@ -21,8 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     _initNoAds();
     // Navigate to player selection screen after 3 seconds
-    Future.delayed(const Duration(seconds: 4), () {
-      Navigator.push(
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => FirstScreen()),
       );

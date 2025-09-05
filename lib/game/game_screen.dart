@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../Utils/common.dart';
 import '../models/game_data_model.dart';
+import '../services/app_open_ad_manager.dart';
 import '../services/game_service.dart';
+import '../widgets/native_banner_ad_widget.dart';
 import 'games_list_screen.dart';
 
 class GameScreen extends StatefulWidget {
@@ -16,11 +19,52 @@ class _GameScreenState extends State<GameScreen> {
   List<String> _categories = [];
   bool _isLoading = true;
   String? _error;
+  BannerAd? _bannerAd;
+  InterstitialAd? _interstitialAd;
 
   @override
   void initState() {
     super.initState();
+    _loadInterstitialAd(Common.interstitial_ad_id);
+    _loadInterstitialAd(Common.interstitial_ad_id1);
+    _loadInterstitialAd(Common.interstitial_ad_id2);
+
     _loadGames();
+  }
+
+  void _loadInterstitialAd(String ads_id) {
+    InterstitialAd.load(
+      adUnitId: ads_id,
+      // Android test interstitial ad unit ID
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) => _interstitialAd = ad,
+        onAdFailedToLoad: (error) => _interstitialAd = null,
+      ),
+    );
+  }
+
+  void _showInterstitialAd(VoidCallback onAdClosed, String ads_id) {
+    if (_interstitialAd != null) {
+      // Prevent app open ad on the next resume caused by interstitial
+      AppOpenAdManager.suppressNextOnResume();
+      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (ad) {
+          ad.dispose();
+          _loadInterstitialAd(ads_id);
+          onAdClosed();
+        },
+        onAdFailedToShowFullScreenContent: (ad, error) {
+          ad.dispose();
+          _loadInterstitialAd(ads_id);
+          onAdClosed();
+        },
+      );
+      _interstitialAd!.show();
+      _interstitialAd = null;
+    } else {
+      onAdClosed();
+    }
   }
 
   Future<void> _loadGames() async {
@@ -175,23 +219,30 @@ class _GameScreenState extends State<GameScreen> {
             },
           ),
         ),
-        Common.Qurekaid.isNotEmpty
-            ? InkWell(
-                onTap: Common.openUrl,
-                child: Image(
-                  width: MediaQuery.of(context).size.width,
-                  image: const AssetImage("assets/images/bannerads.png"),
-                  fit: BoxFit.fill,
-                ),
-              )
-            : SizedBox(),
+        Stack(
+          children: [
+            Common.Qurekaid.isNotEmpty
+                ? InkWell(
+                    onTap: Common.openUrl,
+                    child: Image(
+                      width: MediaQuery.of(context).size.width,
+                      image: const AssetImage("assets/images/bannerads.png"),
+                      fit: BoxFit.fill,
+                    ),
+                  )
+                : SizedBox(),
+            Common.native_ad_id.isNotEmpty
+                ? NativeBannerAdWidget()
+                : SizedBox(),
+          ],
+        ),
       ],
     );
   }
 
   Widget _buildCategoryCard(
     BuildContext context,
-    String category,
+    final category,
     List<Game> games,
   ) {
     return Card(
@@ -203,12 +254,21 @@ class _GameScreenState extends State<GameScreen> {
           if (Common.adsopen == "1") {
             Common.openUrl();
           }
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) =>
-                  GamesListScreen(category: category, games: games),
-            ),
-          );
+          Common.interstitial_ad_id1.isEmpty
+              ? Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        GamesListScreen(category: category, games: games),
+                  ),
+                )
+              : _showInterstitialAd(() {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          GamesListScreen(category: category, games: games),
+                    ),
+                  );
+                }, Common.interstitial_ad_id1);
         },
         borderRadius: BorderRadius.circular(15),
         child: Container(

@@ -3,16 +3,19 @@ import 'package:url_launcher/url_launcher.dart';
 class Common {
   static String packageName = 'com.gamewarrier.gamechanger.ludomaster';
 
-  static String bannar_ad_id = 'ca-app-pub-3940256099942544/6300978111';
-  static String interstitial_ad_id = 'ca-app-pub-3940256099942544/1033173712';
-  static String native_ad_id = 'ca-app-pub-3940256099942544/2247696110';
-  static String app_open_ad_id =
-      'ca-app-pub-3940256099942544/9257395921'; // Test app open ad unit ID
+  // static String bannar_ad_id = 'ca-app-pub-3940256099942544/6300978111';
+  // static String interstitial_ad_id = 'ca-app-pub-3940256099942544/1033173712';
+  // static String interstitial_ad_id1 = 'ca-app-pub-3940256099942544/1033173712';
+  // static String interstitial_ad_id2 = 'ca-app-pub-3940256099942544/1033173712';
+  // static String native_ad_id = 'ca-app-pub-3940256099942544/2247696110';
+  // static String app_open_ad_id = 'ca-app-pub-3940256099942544/9257395921'; // Test app open ad unit ID
 
-  // static String bannar_ad_id = '';  //admobId
-  // static String interstitial_ad_id = '';  //admobFull
-  // static String native_ad_id = '';  //admobNative
-  // static String app_open_ad_id = '';  //rewardedInt
+  static String bannar_ad_id = ''; //admobId
+  static String interstitial_ad_id = ''; //admobFull
+  static String interstitial_ad_id1 = ''; //admobFull
+  static String interstitial_ad_id2 = ''; //admobFull
+  static String native_ad_id = ''; //admobNative
+  static String app_open_ad_id = ''; //rewardedInt
 
   static String privacy_policy = ''; //rewardedFull
   static String terms_conditions = ''; //rewardedFull2
@@ -53,5 +56,4 @@ class Common {
       await Future.delayed(const Duration(milliseconds: 5000));
     }
   }
-
 }

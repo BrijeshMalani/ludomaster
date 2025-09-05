@@ -5,8 +5,8 @@ import 'package:ludomaster/player_selection_screen.dart';
 import 'package:ludomaster/privacy_policy_screen.dart';
 import 'package:ludomaster/share_service.dart';
 import 'package:ludomaster/services/app_open_ad_manager.dart';
-import 'package:ludomaster/widgets/native_ad_banner_widget.dart';
 import 'package:ludomaster/widgets/native_ad_widget.dart';
+import 'package:ludomaster/widgets/native_banner_ad_widget.dart';
 
 import 'Utils/common.dart';
 import 'feedback_service.dart';
@@ -26,7 +26,9 @@ class _FirstScreenState extends State<FirstScreen> {
   void initState() {
     super.initState();
     _loadBannerAd();
-    _loadInterstitialAd();
+    _loadInterstitialAd(Common.interstitial_ad_id);
+    _loadInterstitialAd(Common.interstitial_ad_id1);
+    _loadInterstitialAd(Common.interstitial_ad_id2);
   }
 
   void _loadBannerAd() {
@@ -44,9 +46,9 @@ class _FirstScreenState extends State<FirstScreen> {
     )..load();
   }
 
-  void _loadInterstitialAd() {
+  void _loadInterstitialAd(String ads_id) {
     InterstitialAd.load(
-      adUnitId: Common.interstitial_ad_id,
+      adUnitId: ads_id,
       // Android test interstitial ad unit ID
       request: AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
@@ -56,19 +58,19 @@ class _FirstScreenState extends State<FirstScreen> {
     );
   }
 
-  void _showInterstitialAd(VoidCallback onAdClosed) {
+  void _showInterstitialAd(VoidCallback onAdClosed, String ads_id) {
     if (_interstitialAd != null) {
       // Prevent app open ad on the next resume caused by interstitial
       AppOpenAdManager.suppressNextOnResume();
       _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
           ad.dispose();
-          _loadInterstitialAd();
+          _loadInterstitialAd(ads_id);
           onAdClosed();
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
           ad.dispose();
-          _loadInterstitialAd();
+          _loadInterstitialAd(ads_id);
           onAdClosed();
         },
       );
@@ -194,7 +196,7 @@ class _FirstScreenState extends State<FirstScreen> {
                                                 const PlayerSelectionScreen(),
                                           ),
                                         );
-                                      });
+                                      }, Common.interstitial_ad_id);
                               },
                               child: Image(
                                 height:
@@ -208,7 +210,11 @@ class _FirstScreenState extends State<FirstScreen> {
                                 if (Common.adsopen == "2") {
                                   Common.openUrl();
                                 }
+                                // Common.interstitial_ad_id1.isEmpty
+                                //     ? FeedbackService.openPlayStoreFeedback()
+                                //     : _showInterstitialAd(() {
                                 FeedbackService.openPlayStoreFeedback();
+                                // }, Common.interstitial_ad_id1);
                               },
                               child: Image(
                                 height:
@@ -245,7 +251,11 @@ class _FirstScreenState extends State<FirstScreen> {
                                     Common.adsopen == "2") {
                                   Common.openUrl();
                                 }
+                                // Common.interstitial_ad_id2.isEmpty
+                                //     ? ShareService.shareAppOnSocialMedia()
+                                //     : _showInterstitialAd(() {
                                 ShareService.shareAppOnSocialMedia();
+                                // }, Common.interstitial_ad_id2);
                               },
                               child: Image(
                                 height:
@@ -259,12 +269,21 @@ class _FirstScreenState extends State<FirstScreen> {
                                 if (Common.adsopen == "2") {
                                   Common.openUrl();
                                 }
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const PrivacyPolicyScreen(),
-                                  ),
-                                );
+                                Common.interstitial_ad_id1.isEmpty
+                                    ? Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const PrivacyPolicyScreen(),
+                                        ),
+                                      )
+                                    : _showInterstitialAd(() {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const PrivacyPolicyScreen(),
+                                          ),
+                                        );
+                                      }, Common.interstitial_ad_id1);
                               },
                               child: Image(
                                 height:
@@ -295,7 +314,7 @@ class _FirstScreenState extends State<FirstScreen> {
                           )
                         : SizedBox(),
                     Common.native_ad_id.isNotEmpty
-                        ? NativeAdBannerWidget()
+                        ? NativeBannerAdWidget()
                         : SizedBox(),
                   ],
                 ),
@@ -369,28 +388,45 @@ class _FirstScreenState extends State<FirstScreen> {
                         ],
                       ),
                     ),
-                    Common.Qurekaid.isNotEmpty
-                        ? Container(
-                            height: 100,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Common.Qurekaid.isNotEmpty
-                                ? InkWell(
-                                    onTap: Common.openUrl,
-                                    child: Image(
-                                      width: MediaQuery.of(context).size.width,
-                                      image: const AssetImage(
-                                        "assets/images/bannerads.png",
-                                      ),
-                                      fit: BoxFit.fill,
-                                    ),
-                                  )
-                                : SizedBox(),
-                          )
-                        : SizedBox(),
+                    // Common.Qurekaid.isNotEmpty
+                    //     ? Container(
+                    //         height: 100,
+                    //         width: double.infinity,
+                    //         decoration: BoxDecoration(
+                    //           borderRadius: BorderRadius.circular(10),
+                    //           border: Border.all(color: Colors.grey.shade300),
+                    //         ),
+                    //         child: InkWell(
+                    //           onTap: Common.openUrl,
+                    //           child: Image(
+                    //             width: MediaQuery.of(context).size.width,
+                    //             image: const AssetImage(
+                    //               "assets/images/bannerads.png",
+                    //             ),
+                    //             fit: BoxFit.fill,
+                    //           ),
+                    //         ),
+                    //       )
+                    //     : SizedBox(),
+                    Stack(
+                      children: [
+                        Common.Qurekaid.isNotEmpty
+                            ? InkWell(
+                                onTap: Common.openUrl,
+                                child: Image(
+                                  width: MediaQuery.of(context).size.width,
+                                  image: const AssetImage(
+                                    "assets/images/bannerads.png",
+                                  ),
+                                  fit: BoxFit.fill,
+                                ),
+                              )
+                            : SizedBox(),
+                        Common.native_ad_id.isNotEmpty
+                            ? NativeBannerAdWidget()
+                            : SizedBox(),
+                      ],
+                    ),
                     // Buttons
                     Padding(
                       padding: const EdgeInsets.all(16),

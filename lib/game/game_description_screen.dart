@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Utils/common.dart';
 import '../models/game_data_model.dart';
+import '../widgets/native_banner_ad_widget.dart';
 import 'webview_screen.dart';
 
 class GameDescriptionScreen extends StatelessWidget {
@@ -360,16 +361,25 @@ class GameDescriptionScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Common.Qurekaid.isNotEmpty
-                ? InkWell(
-              onTap: Common.openUrl,
-              child: Image(
-                width: MediaQuery.of(context).size.width,
-                image: const AssetImage("assets/images/bannerads.png"),
-                fit: BoxFit.fill,
-              ),
-            )
-                : SizedBox(),
+            Stack(
+              children: [
+                Common.Qurekaid.isNotEmpty
+                    ? InkWell(
+                        onTap: Common.openUrl,
+                        child: Image(
+                          width: MediaQuery.of(context).size.width,
+                          image: const AssetImage(
+                            "assets/images/bannerads.png",
+                          ),
+                          fit: BoxFit.fill,
+                        ),
+                      )
+                    : SizedBox(),
+                Common.native_ad_id.isNotEmpty
+                    ? NativeBannerAdWidget()
+                    : SizedBox(),
+              ],
+            ),
           ],
         ),
       ),

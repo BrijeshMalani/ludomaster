@@ -1,3 +1,5 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -23,7 +25,7 @@ Future<void> updateNoAdsState() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp();
   // Check purchase state before anything else
   await updateNoAdsState();
 
@@ -58,8 +60,8 @@ Future<void> main() async {
 
     if (data.qurekaId.isNotEmpty) {
       print('qureka link: ${data.qurekaId}');
-      // Common.Qurekaid = data.qurekaId;
-      Common.Qurekaid = "";
+      Common.Qurekaid = data.qurekaId;
+      // Common.Qurekaid = "";
     }
 
     if (data.admobId.isNotEmpty) {
@@ -69,6 +71,14 @@ Future<void> main() async {
     if (data.admobFull.isNotEmpty) {
       print('Setting interstitial ad ID: ${data.admobFull}');
       Common.interstitial_ad_id = data.admobFull;
+    }
+    if (data.admobFull1.isNotEmpty) {
+      print('Setting interstitial ad ID1: ${data.admobFull1}');
+      Common.interstitial_ad_id1 = data.admobFull1;
+    }
+    if (data.admobFull2.isNotEmpty) {
+      print('Setting interstitial ad ID2: ${data.admobFull2}');
+      Common.interstitial_ad_id2 = data.admobFull2;
     }
     if (data.admobNative.isNotEmpty) {
       print('Setting native ad ID: ${data.admobNative}');
@@ -153,9 +163,13 @@ class _RootState extends State<Root> {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: analytics), // ✅ track navigation
+      ],
+      home: const SplashScreen(),
     );
   }
 }

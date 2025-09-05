@@ -4,6 +4,7 @@ import 'package:ludomaster/privacy_policy_screen.dart';
 import 'package:ludomaster/share_service.dart';
 import 'package:ludomaster/widgets/board_widget.dart';
 import 'package:ludomaster/widgets/dice_widget.dart';
+import 'package:ludomaster/widgets/native_banner_ad_widget.dart';
 import 'package:provider/provider.dart';
 
 import 'Utils/common.dart';
@@ -13,6 +14,7 @@ import 'ludo_provider.dart';
 
 class MainScreen extends StatefulWidget {
   final int playerCount;
+
   const MainScreen({super.key, this.playerCount = 4});
 
   @override
@@ -35,14 +37,14 @@ class _MainScreenState extends State<MainScreen> {
       case LudoPlayerType.green:
         return {
           'left': 20, // Top-left corner
-          'top': 50, // Higher up, closer to status bar
+          'top': 35, // Higher up, closer to status bar
           'right': null,
           'bottom': null,
         };
       case LudoPlayerType.yellow:
         return {
           'left': null,
-          'top': 50, // Higher up, closer to status bar
+          'top': 35, // Higher up, closer to status bar
           'right': 20, // Top-right corner
           'bottom': null,
         };
@@ -51,22 +53,17 @@ class _MainScreenState extends State<MainScreen> {
           'left': null,
           'top': null,
           'right': 20, // Bottom-right corner
-          'bottom': 50, // Higher up from bottom
+          'bottom': 35, // Higher up from bottom
         };
       case LudoPlayerType.red:
         return {
           'left': 20, // Bottom-left corner
           'top': null,
           'right': null,
-          'bottom': 50, // Higher up from bottom
+          'bottom': 35, // Higher up from bottom
         };
       default:
-        return {
-          'left': 20,
-          'top': 50,
-          'right': null,
-          'bottom': null,
-        };
+        return {'left': 20, 'top': 50, 'right': null, 'bottom': null};
     }
   }
 
@@ -117,16 +114,16 @@ class _MainScreenState extends State<MainScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          BoardWidget(),
-                        ],
+                        children: [BoardWidget()],
                       ),
                     ),
                     // Dice positioned in screen corners based on current player
                     Consumer<LudoProvider>(
                       builder: (context, provider, child) {
                         Map<String, double?> position =
-                            getDicePositionInCorners(provider.currentPlayer.type);
+                            getDicePositionInCorners(
+                              provider.currentPlayer.type,
+                            );
 
                         return Positioned(
                           left: position['left'],
@@ -153,7 +150,8 @@ class _MainScreenState extends State<MainScreen> {
                       },
                     ),
                     Consumer<LudoProvider>(
-                      builder: (context, value, child) => value.winners.length == 3
+                      builder: (context, value, child) =>
+                          value.winners.length == 3
                           ? Container(
                               color: Colors.black.withOpacity(0.8),
                               child: Center(
@@ -161,26 +159,40 @@ class _MainScreenState extends State<MainScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Image.asset("assets/images/thankyou.gif"),
-                                    const Text("Thank you for playing 😙",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 20),
-                                        textAlign: TextAlign.center),
+                                    const Text(
+                                      "Thank you for playing 😙",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
                                     Text(
-                                        "The Winners is: ${value.winners.map((e) => e.name.toUpperCase()).join(", ")}",
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 30),
-                                        textAlign: TextAlign.center),
+                                      "The Winners is: ${value.winners.map((e) => e.name.toUpperCase()).join(", ")}",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 30,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
                                     const Divider(color: Colors.white),
                                     const Text(
-                                        "This game made with Flutter ❤️ by Mochamad Nizwar Syafuan",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 15),
-                                        textAlign: TextAlign.center),
+                                      "This game made with Flutter ❤️ by Mochamad Nizwar Syafuan",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
                                     const SizedBox(height: 20),
-                                    const Text("Refresh your browser to play again",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 10),
-                                        textAlign: TextAlign.center),
+                                    const Text(
+                                      "Refresh your browser to play again",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -190,18 +202,25 @@ class _MainScreenState extends State<MainScreen> {
                   ],
                 ),
               ),
-              Common.Qurekaid.isNotEmpty
-                  ? InkWell(
-                onTap: Common.openUrl,
-                child: Image(
-                  width: MediaQuery.of(context).size.width,
-                  image: const AssetImage(
-                    "assets/images/bannerads.png",
-                  ),
-                  fit: BoxFit.fill,
-                ),
-              )
-                  : SizedBox(),
+              Stack(
+                children: [
+                  Common.Qurekaid.isNotEmpty
+                      ? InkWell(
+                          onTap: Common.openUrl,
+                          child: Image(
+                            width: MediaQuery.of(context).size.width,
+                            image: const AssetImage(
+                              "assets/images/bannerads.png",
+                            ),
+                            fit: BoxFit.fill,
+                          ),
+                        )
+                      : SizedBox(),
+                  Common.native_ad_id.isNotEmpty
+                      ? NativeBannerAdWidget()
+                      : SizedBox(),
+                ],
+              ),
             ],
           ),
         ),
@@ -357,12 +376,12 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildPopupMenuItem(
-      BuildContext context, {
-        required IconData icon,
-        required String title,
-        required String subtitle,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
