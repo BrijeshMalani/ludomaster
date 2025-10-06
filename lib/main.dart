@@ -91,17 +91,7 @@ Future<void> main() async {
   }
 
   // Initialize Mobile Ads SDK
-  await MobileAds.instance.initialize().then((initializationStatus) {
-    print('Mobile Ads SDK initialized');
-    // Set test device ID
-    MobileAds.instance.updateRequestConfiguration(
-      RequestConfiguration(
-        testDeviceIds: ['188CBD28D7B3F383A267B0FA91535B3B'],
-        tagForChildDirectedTreatment: TagForChildDirectedTreatment.unspecified,
-        tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified,
-      ),
-    );
-  });
+  await MobileAds.instance.initialize();
 
   // Initialize AppLifecycleReactor
   final appLifecycleReactor = AppLifecycleReactor(
@@ -147,10 +137,7 @@ class _RootState extends State<Root> {
         precacheImage(const AssetImage("assets/images/crown/2nd.png"), context),
         precacheImage(const AssetImage("assets/images/crown/3rd.png"), context),
         precacheImage(const AssetImage("assets/images/bannerads.png"), context),
-        precacheImage(
-          const AssetImage("assets/images/letsgo.png.png"),
-          context,
-        ),
+        precacheImage(const AssetImage("assets/images/letsgo.png"), context),
         precacheImage(const AssetImage("assets/images/qurekaads.png"), context),
         precacheImage(
           const AssetImage("assets/images/qurekaads2.png"),
